@@ -299,7 +299,6 @@ def homepage():
                     .all())
 
         return render_template('home.html', messages=messages)
-
     else:
         return render_template('home-anon.html')
 
@@ -310,6 +309,7 @@ def homepage():
 #   handled elsewhere)
 #
 # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+
 
 @app.after_request
 def add_header(req):
