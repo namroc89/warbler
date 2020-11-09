@@ -299,6 +299,45 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+########################################################################
+# "Like" related pages
+
+
+@app.route("/users/add_like/<int:msg_id>", methods=['POST'])
+def add_like(msg_id):
+    """A user can like a message to be saved to the user"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    liked_msg = Message.query.get_or_404(msg_id)
+    if liked_msg.user_id != g.user.id:
+        g.user.likes.append(liked_msg)
+        db.session.commit()
+        return redirect("/")
+    flash("No liking your own message!", "danger")
+    return redirect("/")
+
+
+@app.route("/users/remove_like/<int:msg_id>", methods=['POST'])
+def remove_like(msg_id):
+    """A user can like a message to be saved to the user"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    liked_msg = Message.query.get_or_404(msg_id)
+    g.user.likes.remove(liked_msg)
+    db.session.commit()
+    return redirect("/")
+
+
+@app.route("/users/<int:user_id>/likes")
+def show_user_likes(user_id):
+    """a page that shows all the messages a user liked"""
+    user = User.query.get_or_404(user_id)
+    liked_messages = user.likes
+    return render_template('users/likes.html', user=user, messages=liked_messages)
+
 
 ##############################################################################
 # Homepage and error pages
@@ -320,7 +359,9 @@ def homepage():
                     .limit(100)
                     .all())
 
-        return render_template('home.html', messages=messages)
+        likes = g.user.likes
+
+        return render_template('home.html', messages=messages, likes=likes, user=g.user)
     else:
         return render_template('home-anon.html')
 
