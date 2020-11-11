@@ -294,10 +294,14 @@ def messages_destroy(message_id):
         return redirect("/")
 
     msg = Message.query.get(message_id)
-    db.session.delete(msg)
-    db.session.commit()
+    if msg.user_id != session[CURR_USER_KEY]:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    else:
+        db.session.delete(msg)
+        db.session.commit()
 
-    return redirect(f"/users/{g.user.id}")
+        return redirect(f"/users/{g.user.id}")
 
 ########################################################################
 # "Like" related pages
