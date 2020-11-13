@@ -5,7 +5,6 @@
 #    python -m unittest test_message_model.py
 
 
-from app import app
 import os
 from unittest import TestCase
 from sqlalchemy import exc
@@ -19,7 +18,7 @@ from models import db, User, Message, Follows, Likes
 
 os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
 
-
+from app import app  # noqa
 # Now we can import app
 
 

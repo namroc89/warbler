@@ -3,24 +3,20 @@
 # run these tests like:
 #
 #    FLASK_ENV=production python -m unittest test_message_views.py
-
-
-from app import app, CURR_USER_KEY
 import os
 from unittest import TestCase
-
 from models import db, connect_db, Message, User, Likes, Follows
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+from app import app, CURR_USER_KEY  # noqa
+
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
-
 
 # Now we can import app
-
 
 # Create our tables (we do this here, so we only create the tables
 # once for all tests --- in each test, we'll delete the data
@@ -50,6 +46,11 @@ class MessageViewTestCase(TestCase):
                                     image_url=None)
 
         db.session.commit()
+
+    def tearDown(self):
+        res = super().tearDown()
+        db.session.rollback()
+        return res
 
     def test_add_message(self):
         """Can use add a message?"""
